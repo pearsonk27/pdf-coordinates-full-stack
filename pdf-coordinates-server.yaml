@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  namespace: pdf-coordinates
+spec:
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          image: pearsonk27/pdf-coordinates-server:latest
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: config
