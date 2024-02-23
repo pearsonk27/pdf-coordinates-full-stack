@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-configmap
+  namespace: pdf-coordinates
+data:
+  POSTGRES_HOST: postgres

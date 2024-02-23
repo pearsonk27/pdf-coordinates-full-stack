@@ -1,77 +1,81 @@
-kind: PersistentVolume
 apiVersion: v1
+kind: Service
 metadata:
-  name: postgres-pv-volume  # Sets PV's name
+  name: postgres
   namespace: pdf-coordinates
   labels:
-    type: local  # Sets PV's type to local
     app: postgres
+    tier: database
 spec:
-  storageClassName: manual
-  capacity:
-    storage: 5Gi # Sets PV Volume
-  accessModes:
-    - ReadWriteMany
-  hostPath:
-    path: "/mnt/data"
+  ports:
+    - port: 5432
+  selector:
+    app: postgres
+    tier: database
+  clusterIP: None
+
 ---
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-  name: postgres-pv-claim  # Sets name of PVC
+  name: postgres-pv-claim
   namespace: pdf-coordinates
   labels:
     app: postgres
+    tier: database
 spec:
-  storageClassName: manual
   accessModes:
-    - ReadWriteMany  # Sets read and write access
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi  # Sets volume size
+      storage: 1Gi
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres  # Sets Deployment name
+  name: postgres
   namespace: pdf-coordinates
+  labels:
+    app: postgres
+    tier: database
+
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: postgres
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         app: postgres
+        tier: database
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: postgres
-          image: postgres:10.1 # Sets Image
+          image: postgres
+          resources:
+            requests:
+              cpu: 125m
+              memory: 50Mi
+              ephemeral-storage: "1Gi"
+            limits:
+              cpu: 250m
+              memory: 100Mi
+              ephemeral-storage: "2Gi"
           imagePullPolicy: "IfNotPresent"
-          ports:
-            - containerPort: 5432  # Exposes container port
           envFrom:
-            - configMapRef:
-                name: config
+            - secretRef:
+                name: postgres-credentials
+          ports:
+            - containerPort: 5432
+              name: postgres
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              name: postgredb
+              name: postgres-persistance-storage
       volumes:
-        - name: postgredb
+        - name: postgres-persistance-storage
           persistentVolumeClaim:
             claimName: postgres-pv-claim
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres # Sets service name
-  namespace: pdf-coordinates
-  labels:
-    app: postgres # Labels and Selectors
-spec:
-  type: NodePort # Sets service type
-  ports:
-    - port: 5432 # Sets port to run the postgres application
-  selector:
-    app: postgres
