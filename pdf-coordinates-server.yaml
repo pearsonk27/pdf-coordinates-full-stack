@@ -7,8 +7,7 @@ metadata:
     name: server
 spec:
   ports:
-    - nodePort: 30163
-      port: 8080
+    - port: 8080
       targetPort: 8080
       protocol: TCP
   selector:
@@ -39,11 +38,11 @@ spec:
           resources:
             requests:
               cpu: 125m
-              memory: 50Mi
+              memory: 500Mi
               ephemeral-storage: "1Gi"
             limits:
               cpu: 250m
-              memory: 100Mi
+              memory: 1000Mi
               ephemeral-storage: "2Gi"
           envFrom:
             - configMapRef:
