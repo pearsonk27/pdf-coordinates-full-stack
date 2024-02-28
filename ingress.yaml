@@ -7,8 +7,25 @@ metadata:
     name: ui
 spec:
   ingressClassName: contour
-  defaultBackend:
-    service:
-      name: ui
-      port:
-        number: 80
+  # defaultBackend:
+  #   service:
+  #     name: ui
+  #     port:
+  #       number: 80
+  rules:
+    - http:
+        paths:
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: backend
+              port:
+                number: 8080
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: ui
+              port:
+                number: 80
