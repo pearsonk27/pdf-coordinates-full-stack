@@ -67,6 +67,8 @@ spec:
               ephemeral-storage: "2Gi"
           imagePullPolicy: "IfNotPresent"
           envFrom:
+            - configMapRef:
+                name: postgres-configmap
             - secretRef:
                 name: postgres-credentials
           ports:

@@ -22,6 +22,13 @@ spec:
               name: backend
               port:
                 number: 8080
+        - path: /learner
+          pathType: Prefix
+          backend:
+            service:
+              name: learner
+              port:
+                number: 8000
         - path: /
           pathType: Prefix
           backend:

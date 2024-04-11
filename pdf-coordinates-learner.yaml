@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: learner
+  namespace: pdf-coordinates
+  labels:
+    name: learner
+spec:
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: learner
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learner
+  namespace: pdf-coordinates
+spec:
+  selector:
+    matchLabels:
+      app: learner
+  template:
+    metadata:
+      labels:
+        app: learner
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: learner
+          image: pearsonk27/pdf-coordinates-learner:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              name: http
+          resources:
+            requests:
+              cpu: 125m
+              memory: 500Mi
+              ephemeral-storage: "1Gi"
+            limits:
+              cpu: 250m
+              memory: 1000Mi
+              ephemeral-storage: "2Gi"

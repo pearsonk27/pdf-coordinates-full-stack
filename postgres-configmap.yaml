@@ -5,3 +5,4 @@ metadata:
   namespace: pdf-coordinates
 data:
   POSTGRES_HOST: postgres
+  POSTGRES_DATABASE: pdf_coordinates
